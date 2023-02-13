@@ -1,0 +1,1 @@
+add $t0 , $s2, $t0 # comments
