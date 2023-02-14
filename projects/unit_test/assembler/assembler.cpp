@@ -6,6 +6,7 @@
 #include "unit_test/data_path.h"
 #include "mips_sim/assembler/assembler.h"
 
+//----------------------------------------------------------------------------
 TEST_CASE("R instruct", "[assembler]")
 {
     Assembler Assembler;
@@ -14,6 +15,7 @@ TEST_CASE("R instruct", "[assembler]")
     uint32_t rtn_bin = Assembler.object_code(test_input);
     REQUIRE(expected_output_bin == rtn_bin);
 }
+//----------------------------------------------------------------------------
 
 TEST_CASE("I instruct", "[assembler]")
 {
@@ -23,6 +25,7 @@ TEST_CASE("I instruct", "[assembler]")
     uint32_t rtn_bin = Assembler.object_code(test_input);
     REQUIRE(expected_output_bin == rtn_bin);
 }
+//----------------------------------------------------------------------------
 
 TEST_CASE("load data", "[assembler]")
 {
@@ -41,3 +44,4 @@ TEST_CASE("load data", "[assembler]")
     delete[] buffer;
     //REQUIRE(expected_output_bin == rtn_bin);
 }
+//----------------------------------------------------------------------------

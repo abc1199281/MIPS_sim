@@ -3,6 +3,7 @@
 
 #include "mips_sim/assembler/parser.h"
 
+//----------------------------------------------------------------------------
 TEST_CASE("parse string", "[parser]")
 {
     Parser parser;
@@ -19,6 +20,7 @@ TEST_CASE("parse string", "[parser]")
     }
 }
 
+//----------------------------------------------------------------------------
 TEST_CASE("rest of line", "[comment_remover]")
 {
     Parser parser;
@@ -28,6 +30,7 @@ TEST_CASE("rest of line", "[comment_remover]")
 
     REQUIRE(expected_output.compare(rtn) == 0);
 }
+//----------------------------------------------------------------------------
 
 TEST_CASE("partial in line", "[comment_remover]")
 {
@@ -38,6 +41,7 @@ TEST_CASE("partial in line", "[comment_remover]")
     REQUIRE(expected_output.compare(rtn) == 0);
 }
 
+//----------------------------------------------------------------------------
 TEST_CASE("multi lines", "[comment_remover]")
 {
     Parser parser;
@@ -51,3 +55,4 @@ TEST_CASE("multi lines", "[comment_remover]")
     REQUIRE(expected_output1.compare(rtn1) == 0);
     REQUIRE(expected_output2.compare(rtn2) == 0);
 }
+//----------------------------------------------------------------------------
