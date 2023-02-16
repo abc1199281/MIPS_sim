@@ -1,9 +1,9 @@
 #include <catch2/catch.hpp>
 #include <iostream>
-#include <iomanip>
 
 #include "mips_sim/assembler/parser.h"
 
+//----------------------------------------------------------------------------
 TEST_CASE("parse string", "[parser]")
 {
     Parser parser;
@@ -19,20 +19,8 @@ TEST_CASE("parse string", "[parser]")
         REQUIRE(rtn.at(i) == expected_output.at(i));
     }
 }
-/*
-TEST_CASE("parse R instruct", "[parser]")
-{
-    std::string mnemonic = "add";
-    std::string rs_str = "$s1";
-    std::string rt_str = "$s2";
-    std::string rd_str = "$t0";
 
-    uint32_t binary_form = parse_R_instruct(mnemonic, rs_str, rt_str, rd_str);
-    std::cout << std::hex << (unsigned int)binary_form << std::endl;
-    REQUIRE(1 == 1);
-}
-*/
-
+//----------------------------------------------------------------------------
 TEST_CASE("rest of line", "[comment_remover]")
 {
     Parser parser;
@@ -42,6 +30,7 @@ TEST_CASE("rest of line", "[comment_remover]")
 
     REQUIRE(expected_output.compare(rtn) == 0);
 }
+//----------------------------------------------------------------------------
 
 TEST_CASE("partial in line", "[comment_remover]")
 {
@@ -52,6 +41,7 @@ TEST_CASE("partial in line", "[comment_remover]")
     REQUIRE(expected_output.compare(rtn) == 0);
 }
 
+//----------------------------------------------------------------------------
 TEST_CASE("multi lines", "[comment_remover]")
 {
     Parser parser;
@@ -65,3 +55,4 @@ TEST_CASE("multi lines", "[comment_remover]")
     REQUIRE(expected_output1.compare(rtn1) == 0);
     REQUIRE(expected_output2.compare(rtn2) == 0);
 }
+//----------------------------------------------------------------------------
