@@ -1,9 +1,10 @@
 #include "mips_sim/cpu/instruction_memory_unit.h"
 
 //----------------------------------------------------------------------------
-void InstructionMemoryUnit::process(uint32_t in_address, uint32_t &out_value)
+InstructionMemoryUnit::Instruction InstructionMemoryUnit::fetch(uint32_t address)
 {
-    out_value = read(in_address);
+    // TODO: address protection
+    return Instruction(read(address));
 };
 
 //----------------------------------------------------------------------------

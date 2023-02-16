@@ -11,14 +11,14 @@
 class CPU
 {
 public:
-    void process();
+    virtual void process() = 0;
 
-private:
     // blocks
     DataMemoryUnit data_mem;
     InstructionMemoryUnit inst_mem;
     RegisterFile reg_file;
     ALU alu;
+
     // internal variables
     uint32_t pc; // program counter
     uint32_t cpu_out = 0;

@@ -5,15 +5,16 @@
 
 class ALU{
 public:
-
-    void process(uint32_t in_val1, uint32_t in_val2,
-                 uint8_t ctrl,
-                 uint32_t out_val, bool& is_zero){
-
+    enum class Ctrl : uint8_t
+    {
+        AND = 0b0000,
+        OR = 0b0001,
+        ADD = 0b0010,
+        SUB = 0b0110,
+        SLT = 0b0111,
+        NOR = 0b1100
     };
-
-private:
-
+    void process(uint32_t in_val1, uint32_t in_val2, Ctrl ALU_Ctrl, uint32_t out_val, bool &is_zero);
 };
 
 #endif // __ALU_H__
