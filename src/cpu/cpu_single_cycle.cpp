@@ -48,10 +48,12 @@ void CPU_SingleCycle::process()
     cpu_out = multiplier_2to1(ctrl_signals.MemtoReg, data_mem_out, alu_out);
 
     // Update program counter
-    pc += 4;
-    uint32_t br_addr_out = extend_addr << 2 + pc;
+    uint32_t pc_add4 = pc + 4;
+    uint32_t br_addr_out = extend_addr << 2 + pc_add4;
     bool PCSrc = ctrl_signals.Branch && is_zero;
-    pc = multiplier_2to1(PCSrc, pc, br_addr_out);
+    uint32_t jump_address = (inst.long_address << 4) | (unpack(pc_add4, 28, 4) << 28);
+    pc = multiplier_2to1(PCSrc, pc_add4, br_addr_out);
+    pc = multiplier_2to1(ctrl_signals.Jump, jump_address, pc);
 }
 
 //----------------------------------------------------------------------------
@@ -88,10 +90,11 @@ ALU::Ctrl CPU_SingleCycle::alu_ctrl(uint8_t funct, uint8_t ALU_Op)
 CPU_SingleCycle::CtrlSignals CPU_SingleCycle::ctrl(uint8_t opcode)
 {
     static std::unordered_map<uint8_t, uint16_t> opcode_map = {
-        {0b000000, 0b100100010},
-        {0b100011, 0b011110000},
-        {0b101011, 0b010001000},
-        {0b000100, 0b000000101}};
+        {0b000000, 0b0100100010},
+        {0b100011, 0b0011110000},
+        {0b101011, 0b0010001000},
+        {0b000100, 0b0000000101},
+        {0b000010, 0b1000000000}};
 
     if (opcode_map.find(opcode) == opcode_map.end())
     {

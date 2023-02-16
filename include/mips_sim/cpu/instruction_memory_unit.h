@@ -16,6 +16,7 @@ public:
         uint8_t shamt;
         uint8_t funct;
         uint16_t address;
+        uint32_t long_address;
         Instruction(uint32_t val)
             : opcode(unpack(val, 26, 6)),
               rs(unpack(val, 21, 5)),
@@ -23,7 +24,8 @@ public:
               rd(unpack(val, 11, 5)),
               shamt(unpack(val, 6, 5)),
               funct(unpack(val, 0, 5)),
-              address(unpack(val, 0, 16)){};
+              address(unpack(val, 0, 16)),
+              long_address(unpack(val, 0, 26)){};
     };
     InstructionMemoryUnit() = default;
     Instruction fetch(uint32_t in_address);

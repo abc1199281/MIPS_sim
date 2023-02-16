@@ -10,6 +10,7 @@ class CPU_SingleCycle : public CPU
 public:
     struct CtrlSignals
     {
+        bool Jump;
         bool RegDst;
         bool ALUSrc;
         bool MemtoReg;
@@ -19,7 +20,8 @@ public:
         bool Branch;
         uint8_t ALU_Op;
         CtrlSignals(uint16_t val)
-            : RegDst(unpack(val, 8, 1)),
+            : Jump(unpack(val, 9, 1)),
+              RegDst(unpack(val, 8, 1)),
               ALUSrc(unpack(val, 7, 1)),
               MemtoReg(unpack(val, 6, 1)),
               RegWrite(unpack(val, 5, 1)),
