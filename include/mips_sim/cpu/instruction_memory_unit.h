@@ -4,7 +4,7 @@
 #include "mips_sim/cpu/memory_unit.h"
 #include "mips_sim/utils.h"
 
-class InstructionMemoryUnit : private MemoryUnit
+class InstructionMemoryUnit : public MemoryUnit
 {
 public:
     struct Instruction

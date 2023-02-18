@@ -31,6 +31,7 @@ public:
               ALU_Op(unpack(val, 0, 2)){};
     };
     void process();
+    void reset() { pc = 0; }
 
 private:
     CtrlSignals ctrl(uint8_t opcode);

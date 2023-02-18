@@ -1,13 +1,15 @@
+#include <iostream>
+
 #include "mips_sim/cpu/memory_unit.h"
 
 //----------------------------------------------------------------------------
 MemoryUnit::MemoryUnit() : units(MEMORY_SIZE)
 {
     uint32_t cnt = 0;
-    for (auto ele : units)
+    for (uint32_t i = 0; i < MEMORY_SIZE; i++)
     {
-        ele.address = cnt;
-        cnt += 4;
+        units[i].address = i << 2;
+        units[i].value = MEMORY_DEFAULT_VALUE;
     }
 };
 
@@ -30,5 +32,14 @@ void MemoryUnit::write(uint32_t address, uint32_t value)
         L_(lerror) << "address out of range: " << address << ", with range: " << units.back().address;
     }
     units[address / 4].value = value;
+}
+//----------------------------------------------------------------------------
+void MemoryUnit::show(bool hide_default)
+{
+    for (int i = 0; i < MEMORY_SIZE; i++)
+    {
+        if (!hide_default || units[i].value != MEMORY_DEFAULT_VALUE)
+            std::cout << "address: " << units[i].address << ", value: " << units[i].value << std::endl;
+    }
 }
 //----------------------------------------------------------------------------

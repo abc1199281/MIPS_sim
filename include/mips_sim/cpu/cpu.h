@@ -12,6 +12,7 @@ class CPU
 {
 public:
     virtual void process() = 0;
+    virtual void reset() = 0;
 
     // blocks
     DataMemoryUnit data_mem;
@@ -20,7 +21,7 @@ public:
     ALU alu;
 
     // internal variables
-    uint32_t pc; // program counter
+    uint32_t pc = 0; // program counter
     uint32_t cpu_out = 0;
 };
 

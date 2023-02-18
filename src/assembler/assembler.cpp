@@ -189,7 +189,7 @@ void Assembler::load(std::string infile_name)
     std::string line;
     while (std::getline(infile, line))
     {
-        object_code(line);
+        bin_code.push_back(object_code(line));
     }
 }
 

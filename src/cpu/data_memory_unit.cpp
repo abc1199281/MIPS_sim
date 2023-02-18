@@ -5,7 +5,10 @@ void DataMemoryUnit::process(uint32_t in_address, uint32_t in_value,
                              bool MemWrite, bool MemRead,
                              uint32_t &out_value)
 {
-    out_value = read(in_address);
+    if (MemWrite)
+        write(in_address, in_value);
+    if (MemRead)
+        out_value = read(in_address);
 };
 
 //----------------------------------------------------------------------------
