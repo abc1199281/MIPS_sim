@@ -23,6 +23,13 @@ public:
     // internal variables
     uint32_t pc = 0; // program counter
     uint32_t cpu_out = 0;
+
+    // helper functions
+    bool is_end_of_program()
+    {
+        uint32_t next_inst = inst_mem.read(pc);
+        return next_inst == MEMORY_DEFAULT_VALUE;
+    }
 };
 
 #endif // __CPU_H__

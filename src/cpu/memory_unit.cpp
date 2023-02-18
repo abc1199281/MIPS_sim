@@ -27,6 +27,7 @@ uint32_t MemoryUnit::read(uint32_t address)
 //----------------------------------------------------------------------------
 void MemoryUnit::write(uint32_t address, uint32_t value)
 {
+    L_(ldebug4) << std::hex << "address:" << address << ", value: " << value;
     if (address < 0 || address > units.back().address)
     {
         L_(lerror) << "address out of range: " << address << ", with range: " << units.back().address;
@@ -39,7 +40,7 @@ void MemoryUnit::show(bool hide_default)
     for (int i = 0; i < MEMORY_SIZE; i++)
     {
         if (!hide_default || units[i].value != MEMORY_DEFAULT_VALUE)
-            std::cout << "address: " << units[i].address << ", value: " << units[i].value << std::endl;
+            L_(linfo) << "address: " << units[i].address << ", value: " << units[i].value;
     }
 }
 //----------------------------------------------------------------------------

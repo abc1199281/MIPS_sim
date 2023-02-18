@@ -5,6 +5,17 @@
 #include <sstream>
 #include <string>
 #include <stdio.h>
+#include <iostream>
+#include <iomanip>
+#include <filesystem>
+
+#include "mips_sim/build_info.h"
+
+static std::string SplitFilename(const std::string str)
+{
+    auto found = str.find_last_of("/\\");
+    return str.substr(found + 1);
+}
 
 inline std::string NowTime();
 
@@ -17,7 +28,10 @@ class Log
 public:
     Log();
     virtual ~Log();
-    std::ostringstream& Get(TLogLevel level = linfo);
+    std::ostringstream &Get(TLogLevel level = linfo,
+                            const char *file = __FILE__,
+                            const char *funct = __FUNCTION__);
+
 public:
     static TLogLevel& ReportingLevel();
     static std::string ToString(TLogLevel level);
@@ -35,10 +49,14 @@ Log<T>::Log()
 }
 
 template <typename T>
-std::ostringstream& Log<T>::Get(TLogLevel level)
+std::ostringstream &Log<T>::Get(TLogLevel level, const char *file, const char *funct)
 {
-    os << "- " << NowTime();
-    os << " " << ToString(level) << ": ";
+    std::string file_s = file;
+    // os << "- " << NowTime();
+    os << ToString(level);
+    os << ", " << SplitFilename(file_s);
+    os << ", " << funct;
+    os << std::hex << ": ";
     os << std::string(level > ldebug ? level - ldebug : 0, '\t');
     return os;
 }
@@ -101,7 +119,7 @@ inline FILE*& Output2FILE::Stream()
 }
 
 inline void Output2FILE::Output(const std::string& msg)
-{   
+{
     FILE* pStream = Stream();
     if (!pStream)
         return;
@@ -128,15 +146,21 @@ class FILELOG_DECLSPEC FILELog : public Log<Output2FILE> {};
 #define FILELOG_MAX_LEVEL ldebug4
 #endif
 
-#define FILE_LOG(level) \
-    if (level > FILELOG_MAX_LEVEL) ;\
-    else if (level > FILELog::ReportingLevel() || !Output2FILE::Stream()) ; \
-    else FILELog().Get(level)
+#define FILE_LOG(level)                                                   \
+    if (level > FILELOG_MAX_LEVEL)                                        \
+        ;                                                                 \
+    else if (level > FILELog::ReportingLevel() || !Output2FILE::Stream()) \
+        ;                                                                 \
+    else                                                                  \
+        FILELog().Get(level, __FILE__, __FUNCTION__)
 
-#define L_(level) \
-if (level > FILELOG_MAX_LEVEL) ;\
-else if (level > FILELog::ReportingLevel() || !Output2FILE::Stream()) ; \
-else FILELog().Get(level)
+#define L_(level)                                                         \
+    if (level > FILELOG_MAX_LEVEL)                                        \
+        ;                                                                 \
+    else if (level > FILELog::ReportingLevel() || !Output2FILE::Stream()) \
+        ;                                                                 \
+    else                                                                  \
+        FILELog().Get(level, __FILE__, __FUNCTION__)
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 
@@ -146,13 +170,13 @@ inline std::string NowTime()
 {
     const int MAX_LEN = 200;
     char buffer[MAX_LEN];
-    if (GetTimeFormatA(LOCALE_USER_DEFAULT, 0, 0, 
-            "HH':'mm':'ss", buffer, MAX_LEN) == 0)
+    if (GetTimeFormatA(LOCALE_USER_DEFAULT, 0, 0,
+                       "HH':'mm':'ss", buffer, MAX_LEN) == 0)
         return "Error in NowTime()";
 
     char result[100] = {0};
     static DWORD first = GetTickCount();
-    std::sprintf(result, "%s.%03ld", buffer, (long)(GetTickCount() - first) % 1000); 
+    std::sprintf(result, "%s.%03ld", buffer, (long)(GetTickCount() - first) % 1000);
     return result;
 }
 
@@ -170,7 +194,7 @@ inline std::string NowTime()
     struct timeval tv;
     gettimeofday(&tv, 0);
     char result[100] = {0};
-    std::sprintf(result, "%s.%03ld", buffer, (long)tv.tv_usec / 1000); 
+    std::sprintf(result, "%s.%03ld", buffer, (long)tv.tv_usec / 1000);
     return result;
 }
 

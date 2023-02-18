@@ -175,7 +175,6 @@ uint32_t Assembler::object_code(std::string input)
         break;
     }
 
-    bin_code.push_back(rtn);
     return rtn;
 }
 
@@ -189,7 +188,7 @@ void Assembler::load(std::string infile_name)
     std::string line;
     while (std::getline(infile, line))
     {
-        bin_code.push_back(object_code(line));
+        obj_code.push_back(object_code(line));
     }
 }
 
@@ -200,9 +199,10 @@ void Assembler::save(std::string outfile_name)
     if(!outfile.is_open())
         L_(lerror)<<"outfile is not open, with file name: "<< outfile_name;
 
-    while(!bin_code.empty()){
-        uint32_t num = bin_code.front();
+    while (!obj_code.empty())
+    {
+        uint32_t num = obj_code.front();
         outfile.write(reinterpret_cast<const char *>(&num), sizeof(num));
-        bin_code.pop_front();
+        obj_code.pop_front();
     }
 }

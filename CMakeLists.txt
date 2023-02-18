@@ -10,7 +10,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 message(SOURCES="${SOURCES}")
 
-add_library(mips_sim STATIC    
+# Setting max display logger level: lerror, lwarning,linfo, ldebug, ldebug1-4
+#set(FILELOG_MAX_LEVEL "ldebug4")
+set(FILELOG_MAX_LEVEL "linfo")
+configure_file(${PROJECT_SOURCE_DIR}/include/mips_sim/build_info.h.in
+               ${PROJECT_SOURCE_DIR}/include/mips_sim/build_info.h)
+
+add_library(mips_sim STATIC
     ${SOURCES}
 )
 
@@ -30,11 +36,11 @@ message(TEST_SOURCES="${TEST_SOURCES}")
 set(IN_DATA_PATH "\"${PROJECT_SOURCE_DIR}/data/in\"")
 set(OUT_DATA_PATH "\"${PROJECT_SOURCE_DIR}/data/out\"")
 set(LOGGER_PATH "\"${PROJECT_SOURCE_DIR}/data/log\"")
-configure_file(${PROJECT_SOURCE_DIR}/projects/unit_test/data_path.h.in 
+configure_file(${PROJECT_SOURCE_DIR}/projects/unit_test/data_path.h.in
                ${PROJECT_SOURCE_DIR}/projects/unit_test/data_path.h)
 
 # Add an executable with the above sources
-add_executable(mips_ut    
+add_executable(mips_ut
     ${TEST_SOURCES}
 )
 
@@ -46,6 +52,6 @@ target_include_directories(mips_ut
 
 # link the new mips_sim target with the mips_ut target
 target_link_libraries(mips_ut
-    PRIVATE 
+    PRIVATE
     mips_sim
 )

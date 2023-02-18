@@ -19,15 +19,16 @@ void CPU_SingleCycle::process()
     // ALU Ctrl
     ALU::Ctrl ALU_Ctrl = alu_ctrl(inst.funct, ctrl_signals.ALU_Op);
 
-    // register file
+    // register file (read)
     uint8_t reg_idx_r1 = inst.rs;
     uint8_t reg_idx_r2 = inst.rt;
-    uint8_t reg_idx_w1 = multiplier_2to1(ctrl_signals.RegDst, inst.rd, inst.rt);
-    uint8_t reg_in_val = cpu_out; // previous cpu out
     uint32_t reg_out1, reg_out2;
-    reg_file.process(reg_idx_r1, reg_idx_r2, reg_idx_w1, reg_in_val,
-                     ctrl_signals.RegWrite,
-                     reg_out1, reg_out2);
+    reg_file.process_read(reg_idx_r1, reg_idx_r2,
+                          reg_out1, reg_out2);
+
+    L_(ldebug4) << "reg_idx_r1: " << int(reg_idx_r1) << ", reg_idx_r2: " << int(reg_idx_r2);
+
+    L_(ldebug4) << "reg_out1: " << int(reg_out1) << ", reg_out2: " << int(reg_out2) << std::endl;
 
     // ALU
     uint32_t alu_in1 = reg_out1;
@@ -35,6 +36,8 @@ void CPU_SingleCycle::process()
     bool is_zero;
     uint32_t alu_out;
     alu.process(alu_in1, alu_in2, ALU_Ctrl, alu_out, is_zero);
+    L_(ldebug4) << "alu_in1: " << int(alu_in1) << ", alu_in2: " << int(alu_in2);
+    L_(ldebug4) << "alu_out: " << int(alu_out) << ", is_zero:" << is_zero << std::endl;
 
     // data memory
     uint32_t in_address = alu_out;
@@ -43,22 +46,38 @@ void CPU_SingleCycle::process()
     data_mem.process(in_address, in_value,
                      ctrl_signals.MemWrite, ctrl_signals.MemRead,
                      data_mem_out);
-
-    // final multiplier
-    cpu_out = multiplier_2to1(ctrl_signals.MemtoReg, data_mem_out, alu_out);
+    L_(ldebug4) << "in_address: " << int(in_address) << ", in_value: " << int(in_value);
+    L_(ldebug4) << "ctrl_signals.MemWrite: " << int(ctrl_signals.MemWrite) << ", ctrl_signals.MemRead: " << int(ctrl_signals.MemRead);
+    L_(ldebug4) << "data_mem_out: " << int(data_mem_out) << std::endl;
 
     // Update program counter
     uint32_t pc_add4 = pc + 4;
     uint32_t br_addr_out = extend_addr << 2 + pc_add4;
     bool PCSrc = ctrl_signals.Branch && is_zero;
     uint32_t jump_address = (inst.long_address << 4) | (unpack(pc_add4, 28, 4) << 28);
-    pc = multiplier_2to1(PCSrc, pc_add4, br_addr_out);
+    L_(ldebug4) << "ctrl_signals.Branch: " << ctrl_signals.Branch << ", is_zero: " << is_zero;
+    L_(ldebug4) << "PCSrc: " << PCSrc << ", pc_add4: " << pc_add4 << ", br_addr_out: " << br_addr_out;
+    L_(ldebug4) << "ctrl_signals.Jump: " << ctrl_signals.Jump << ", jump_address: " << jump_address;
+    pc = multiplier_2to1(PCSrc, br_addr_out, pc_add4);
     pc = multiplier_2to1(ctrl_signals.Jump, jump_address, pc);
+    L_(ldebug4) << "PC= " << pc;
+
+    // final multiplier
+    cpu_out = multiplier_2to1(ctrl_signals.MemtoReg, data_mem_out, alu_out);
+
+    // register file (write)
+    uint8_t reg_idx_w1 = multiplier_2to1(ctrl_signals.RegDst, inst.rd, inst.rt);
+    uint8_t reg_in_val = cpu_out;
+    reg_file.process_write(reg_idx_w1, reg_in_val, ctrl_signals.RegWrite);
+    L_(ldebug4) << "reg_idx_w1: " << int(reg_idx_w1) << ", reg_in_val: " << int(reg_in_val);
+    L_(ldebug4) << "ctrl_signals.RegWrite: " << int(ctrl_signals.RegWrite) << std::endl
+                << std::endl;
 }
 
 //----------------------------------------------------------------------------
 ALU::Ctrl CPU_SingleCycle::alu_ctrl(uint8_t funct, uint8_t ALU_Op)
 {
+    // Figure 4.13
     static std::unordered_map<uint8_t, uint8_t> funct_map = {
         {0b0000, 0b0010},
         {0b0010, 0b0110},
@@ -67,11 +86,6 @@ ALU::Ctrl CPU_SingleCycle::alu_ctrl(uint8_t funct, uint8_t ALU_Op)
         {0b1010, 0b0111},
     };
     uint8_t sub_funct = funct & B2M(4); // only four bits matter.
-    if (funct_map.find(sub_funct) == funct_map.end())
-    {
-        L_(lerror) << "Error: no function code found in cpu::alu_ctrl";
-        return ALU::Ctrl();
-    }
     std::unordered_map<uint8_t, uint8_t> ALU_map = {
         {0b00, 0b0010},
         {0b01, 0b0110},
@@ -83,12 +97,18 @@ ALU::Ctrl CPU_SingleCycle::alu_ctrl(uint8_t funct, uint8_t ALU_Op)
         L_(lerror) << "Error: no ALU_Op found in cpu::alu_ctrl";
         return ALU::Ctrl();
     }
+    if (ALU_Op == 0b10 && funct_map.find(sub_funct) == funct_map.end())
+    {
+        L_(lerror) << "Error: no function code found in cpu::alu_ctrl:" << int(sub_funct);
+        return ALU::Ctrl();
+    }
     return static_cast<ALU::Ctrl>(ALU_map[ALU_Op]);
 }
 
 //----------------------------------------------------------------------------
 CPU_SingleCycle::CtrlSignals CPU_SingleCycle::ctrl(uint8_t opcode)
 {
+    // Figure 4.22
     static std::unordered_map<uint8_t, uint16_t> opcode_map = {
         {0b000000, 0b0100100010},
         {0b100011, 0b0011110000},
@@ -98,7 +118,7 @@ CPU_SingleCycle::CtrlSignals CPU_SingleCycle::ctrl(uint8_t opcode)
 
     if (opcode_map.find(opcode) == opcode_map.end())
     {
-        L_(lerror) << "Error: no opcode found in cpu::ctrl";
+        L_(lerror) << "Error: no opcode found in cpu::ctrl:" << std::dec << int(opcode);
         return CtrlSignals(0);
     }
     return CtrlSignals(opcode_map[opcode]);

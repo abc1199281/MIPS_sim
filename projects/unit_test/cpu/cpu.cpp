@@ -28,25 +28,23 @@ TEST_CASE("show_data_mem", "[cpu]")
     int num_instrument = length / sizeof(uint32_t);
     char *buffer = new char[4];
 
-    std::vector<uint32_t> instruct(num_instrument);
     for (int i = 0; i < num_instrument; i++)
     {
         infile.read(buffer, sizeof(uint32_t));
         const uint32_t *output_num = reinterpret_cast<const uint32_t *>(buffer);
-        instruct.push_back(*output_num);
-    }
-    int cnt = 0;
-    for (auto ele : instruct)
-    {
-        cpu.inst_mem.write(cnt, ele);
-        cnt += 4;
+        cpu.inst_mem.write(i << 2, *output_num);
     }
 
     // cpu.run
 
-    std::cout << "here2" << std::endl;
-    cpu.process();
-    std::cout << "here3" << std::endl;
+    L_(ldebug4) << "before process:";
+
+    while (!cpu.is_end_of_program())
+    {
+        cpu.process();
+    }
+    L_(ldebug4) << "after process:";
+
     cpu.data_mem.show();
 
     REQUIRE(true);

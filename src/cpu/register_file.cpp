@@ -36,12 +36,15 @@ std::vector<RegisterFile::Register> RegisterFile::registers = {
     {false, "$ra", 0}};
 
 //----------------------------------------------------------------------------
-void RegisterFile::process(uint8_t in_r1_idx, uint8_t in_r2_idx, uint8_t in_w_idx, uint32_t in_val,
-                           bool ctrl_reg_write,
-                           uint32_t &out_val1, uint32_t &out_val2)
+void RegisterFile::process_read(uint8_t in_r1_idx, uint8_t in_r2_idx,
+                                uint32_t &out_val1, uint32_t &out_val2)
 {
     out_val1 = read(in_r1_idx);
     out_val2 = read(in_r2_idx);
+}
+//----------------------------------------------------------------------------
+void RegisterFile::process_write(uint8_t in_w_idx, uint32_t in_val, bool ctrl_reg_write)
+{
     if (ctrl_reg_write)
         write(in_w_idx, in_val);
 }
@@ -64,6 +67,18 @@ void RegisterFile::write(uint32_t index, uint32_t value)
         L_(lerror) << "index out of range: " << index << ", with range: 0~32";
     }
     registers[index].value = value;
+};
+
+//----------------------------------------------------------------------------
+
+void RegisterFile::show(bool skip_zero)
+{
+    for (int i = 0; i < registers.size(); i++)
+    {
+        if (skip_zero && registers[i].value == 0)
+            continue;
+        L_(linfo) << registers[i].name << ": " << registers[i].value;
+    }
 };
 
 //----------------------------------------------------------------------------
