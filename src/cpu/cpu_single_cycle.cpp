@@ -27,7 +27,6 @@ void CPU_SingleCycle::process()
                           reg_out1, reg_out2);
 
     L_(ldebug4) << "reg_idx_r1: " << int(reg_idx_r1) << ", reg_idx_r2: " << int(reg_idx_r2);
-
     L_(ldebug4) << "reg_out1: " << int(reg_out1) << ", reg_out2: " << int(reg_out2) << std::endl;
 
     // ALU
@@ -52,14 +51,15 @@ void CPU_SingleCycle::process()
 
     // Update program counter
     uint32_t pc_add4 = pc + 4;
-    uint32_t br_addr_out = extend_addr << 2 + pc_add4;
+    uint32_t br_addr_out = (extend_addr << 2) + pc_add4;
     bool PCSrc = ctrl_signals.Branch && is_zero;
-    uint32_t jump_address = (inst.long_address << 4) | (unpack(pc_add4, 28, 4) << 28);
+    uint32_t jump_address = (inst.long_address << 2) | (unpack(pc_add4, 28, 4) << 28);
+    pc = multiplier_2to1(PCSrc, br_addr_out, pc_add4);
+    pc = multiplier_2to1(ctrl_signals.Jump, jump_address, pc);
+
     L_(ldebug4) << "ctrl_signals.Branch: " << ctrl_signals.Branch << ", is_zero: " << is_zero;
     L_(ldebug4) << "PCSrc: " << PCSrc << ", pc_add4: " << pc_add4 << ", br_addr_out: " << br_addr_out;
     L_(ldebug4) << "ctrl_signals.Jump: " << ctrl_signals.Jump << ", jump_address: " << jump_address;
-    pc = multiplier_2to1(PCSrc, br_addr_out, pc_add4);
-    pc = multiplier_2to1(ctrl_signals.Jump, jump_address, pc);
     L_(ldebug4) << "PC= " << pc;
 
     // final multiplier

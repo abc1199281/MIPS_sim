@@ -1,8 +1,8 @@
-lw $t0, 0, $zero
+lw $t0, $zero, 0
 add $t1, $zero, $t0
 add $t2, $t1, $t0
 sub $t3, $t2, $t1
-sw $t0, 0, $zero
-sw $t1, 4, $zero
-sw $t2, 8, $zero
-sw $t3, 12,$zero
+sw $t0, $zero, 0
+sw $t1, $zero, 4
+sw $t2, $zero, 8
+sw $t3, $zero, 12

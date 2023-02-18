@@ -43,7 +43,6 @@ void Simulator::simulate(std::string asm_file, std::string mem_file)
             if (!check_line(line))
             {
                 L_(lerror) << "memory .hex format error" << std::endl;
-                // break;
             }
             std::istringstream ss(line);
             std::string word;
@@ -70,7 +69,10 @@ void Simulator::simulate(std::string asm_file, std::string mem_file)
 //----------------------------------------------------------------------------
 void Simulator::show_status()
 {
+    L_(linfo) << "start of reg.show():";
     cpu.reg_file.show();
+    L_(linfo) << "start of data_mem.show():";
     cpu.data_mem.show();
+    L_(linfo) << "end of show()" << std::endl;
 }
 //----------------------------------------------------------------------------

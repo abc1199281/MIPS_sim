@@ -16,3 +16,13 @@ TEST_CASE("classic operation", "[simulator]")
     sim.simulate(in_file, mem_file);
     sim.show_status();
 }
+//----------------------------------------------------------------------------
+TEST_CASE("loop operation", "[simulator]")
+{
+    Simulator sim;
+    std::string in_file = std::string(IN_DATA_PATH) + "/simulator/in_loop.asm";
+    std::string mem_file = std::string(IN_DATA_PATH) + "/simulator/in_loop.hex";
+    sim.simulate(in_file, mem_file);
+    sim.show_status();
+}
+//----------------------------------------------------------------------------

@@ -69,8 +69,8 @@ std::unordered_map<std::string, InstructHelper> mnemonic_parser = {
     {"andi", {InstructHelper::Type::I, 0x0c}},
     {"beq", {InstructHelper::Type::I, 0x04}},
     {"bne", {InstructHelper::Type::I, 0x05}},
-    {"j", {InstructHelper::Type::I, 0x02}},
-    {"jal", {InstructHelper::Type::I, 0x03}},
+    {"j", {InstructHelper::Type::J, 0x02}},
+    {"jal", {InstructHelper::Type::J, 0x03}},
     {"jr", {InstructHelper::Type::R, 0x00, 0x08}},
     {"lbu", {InstructHelper::Type::I, 0x24}},
     {"lhu", {InstructHelper::Type::I, 0x25}},
@@ -94,7 +94,7 @@ std::unordered_map<std::string, InstructHelper> mnemonic_parser = {
     {"subu", {InstructHelper::Type::R, 0x00, 0x23}}};
 
 //----------------------------------------------------------------------------
-typedef struct R_instruction
+struct R_instruction
 {
     uint8_t opcode, rs, rt, rd, shamt, funct;
     uint32_t get()
@@ -108,10 +108,10 @@ typedef struct R_instruction
         rtn = pack(rtn, funct, 0, 6);
         return rtn;
     }
-} R_instruction;
+};
 
 //----------------------------------------------------------------------------
-typedef struct I_instruction
+struct I_instruction
 {
     uint8_t opcode, rs, rt;
     uint16_t const_addr;
@@ -124,7 +124,26 @@ typedef struct I_instruction
         rtn = pack(rtn, const_addr, 0, 16);
         return rtn;
     }
-} I_instruction;
+};
+//----------------------------------------------------------------------------
+struct J_instruction
+{
+    uint8_t opcode;
+    uint16_t const_addr;
+    uint32_t get()
+    {
+        uint32_t rtn = 0;
+        rtn = pack(rtn, opcode, 26, 6);
+        rtn = pack(rtn, const_addr, 0, 26);
+        return rtn;
+    }
+};
+
+//----------------------------------------------------------------------------
+bool Assembler::is_label(std::string str)
+{
+    return label_map.find(str) != label_map.end();
+}
 
 //----------------------------------------------------------------------------
 uint32_t parse_R_instruct(std::string mnemonic, std::string rs_str, std::string rt_str, std::string rd_str)
@@ -139,7 +158,16 @@ uint32_t parse_R_instruct(std::string mnemonic, std::string rs_str, std::string 
     return r_instr.get();
 }
 //----------------------------------------------------------------------------
-uint32_t parse_I_instruct(std::string mnemonic, std::string rs_str, std::string rt_str, uint16_t const_addr)
+uint32_t parse_J_instruct(std::string mnemonic, uint32_t const_addr)
+{
+    J_instruction j_instr;
+    j_instr.opcode = mnemonic_parser[mnemonic].opcode;
+    j_instr.const_addr = const_addr;
+    return j_instr.get();
+}
+//----------------------------------------------------------------------------
+uint32_t Assembler::parse_I_instruct(std::string mnemonic, std::string rs_str,
+                                     std::string rt_str, uint16_t const_addr)
 {
     I_instruction i_instr;
     i_instr.opcode = mnemonic_parser[mnemonic].opcode;
@@ -149,16 +177,53 @@ uint32_t parse_I_instruct(std::string mnemonic, std::string rs_str, std::string 
     return i_instr.get();
 }
 //----------------------------------------------------------------------------
+void Assembler::label_code(std::string input)
+{
+    std::vector<std::string> parsed_str = parser_label.parse(input);
+
+    switch (parsed_str.size())
+    {
+    case 0: // Comments
+        break;
+    case 1: // Labels
+    {
+        parsed_str[0].pop_back(); // delete ':';
+        label_map[parsed_str[0]] = pseudo_pc;
+        L_(ldebug4) << parsed_str[0] << ", address: label " << pseudo_pc;
+    }
+    break;
+    case 2: // Instruction (J)
+    case 4: // Instruction (I,R)
+        pseudo_pc += 4;
+        break;
+    default:
+        L_(lwarning) << "not expected parsed_str.size():" << parsed_str.size() << pseudo_pc;
+        break;
+    }
+}
+//----------------------------------------------------------------------------
 uint32_t Assembler::object_code(std::string input)
 {
     /*
     TODO: protection
     */
-    uint32_t rtn;
+    uint32_t rtn = 0xFFFFFFFF;
     std::vector<std::string> parsed_str = parser.parse(input);
-    if (parsed_str.empty())
+
+    for (auto ele : parsed_str)
+    {
+        L_(ldebug4) << ele << ", ";
+    }
+    L_(ldebug4) << std::endl;
+
+    // Comments or labels
+    if (parsed_str.empty() || parsed_str.size() == 1)
         return rtn;
 
+    if (mnemonic_parser.find(parsed_str[0]) == mnemonic_parser.end())
+    {
+        L_(lerror) << "Instructino type not found, parsed_str[0]:" << parsed_str[0] << std::endl;
+    }
     InstructHelper inst_helper = mnemonic_parser[parsed_str[0]];
 
     switch (inst_helper.format)
@@ -167,14 +232,35 @@ uint32_t Assembler::object_code(std::string input)
         rtn = parse_R_instruct(parsed_str[0], parsed_str[2], parsed_str[3], parsed_str[1]);
         break;
     case InstructHelper::Type::I:
-        //  e.g.,lw $t0, 32, $s3:
-        // str[0]=lw, str[1]=$t0=rt, str[2]= 32 = const_addr, str[3]=$s3=rs
-        rtn = parse_I_instruct(parsed_str[0], parsed_str[3], parsed_str[1], (uint16_t)stoi(parsed_str[2]));
+        //  e.g.,lw $t0, $s3, 32:
+        // str[0]=lw, str[1]=$t0=rt, str[2]= $s3=rs, str[3]=32 = const_addr
+        if (is_label(parsed_str[3]))
+        {
+            // Absolute Label address to Relative jump address.
+            uint32_t jump_addr = ((label_map[parsed_str[3]] - pseudo_pc - 4) >> 2);
+            rtn = parse_I_instruct(parsed_str[0], parsed_str[2], parsed_str[1], jump_addr);
+        }
+        else
+        {
+            rtn = parse_I_instruct(parsed_str[0], parsed_str[2], parsed_str[1], (uint16_t)stoi(parsed_str[3]));
+        }
+        break;
+    case InstructHelper::Type::J:
+        if (is_label(parsed_str[1]))
+        {
+            // Absolute Label address to Relative jump address.
+            uint32_t jump_addr = (label_map[parsed_str[1]] >> 2);
+            rtn = parse_J_instruct(parsed_str[0], jump_addr);
+        }
+        else
+        {
+            rtn = parse_J_instruct(parsed_str[0], (uint32_t)stoi(parsed_str[1]));
+        }
         break;
     default:
         break;
     }
-
+    pseudo_pc += 4;
     return rtn;
 }
 
@@ -185,10 +271,25 @@ void Assembler::load(std::string infile_name)
     if(!infile.is_open())
         L_(lerror)<<"infile is not open, with file name: "<< infile_name;
 
+    // label first
+    std::ifstream infile_label(infile_name);
     std::string line;
+
+    pseudo_pc = 0;
+    while (std::getline(infile_label, line))
+    {
+        label_code(line);
+    }
+
+    // parse instruction
+    pseudo_pc = 0;
     while (std::getline(infile, line))
     {
-        obj_code.push_back(object_code(line));
+        uint32_t obj = object_code(line);
+        if (obj != 0xFFFFFFFF)
+        {
+            obj_code.push_back(obj);
+        }
     }
 }
 

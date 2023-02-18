@@ -18,8 +18,8 @@ uint32_t MemoryUnit::read(uint32_t address)
 {
     if (address < 0 || address > units.back().address)
     {
-        L_(lerror) << "address out of range: " << address << ", with range: " << units.back().address;
-        return 0;
+        L_(lerror) << "address out of range: " << std::hex << address << ", with range: " << units.back().address;
+        return MEMORY_DEFAULT_VALUE;
     }
     return units[address / 4].value;
 }

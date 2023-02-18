@@ -16,13 +16,15 @@ public:
         uint32_t value;
     } Register;
 
+    RegisterFile();
+
     void process_read(uint8_t in_r1_idx, uint8_t in_r2_idx,
                       uint32_t &out_val1, uint32_t &out_val2);
     void process_write(uint8_t in_w_idx, uint32_t in_val, bool ctrl_reg_write);
     void show(bool skip_zero = true);
 
 private:
-    static std::vector<Register> registers;
+    std::vector<Register> registers;
     uint32_t read(uint32_t index);
     void write(uint32_t index, uint32_t value);
     bool reg_write_state = false;
