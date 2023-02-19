@@ -1,0 +1,5 @@
+/**
+ * @brief Version, debug settings
+*/
+
+#cmakedefine FILELOG_MAX_LEVEL ${FILELOG_MAX_LEVEL}
