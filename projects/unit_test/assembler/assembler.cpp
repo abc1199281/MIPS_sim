@@ -20,7 +20,7 @@ TEST_CASE("R instruct", "[assembler]")
 TEST_CASE("I instruct", "[assembler]")
 {
     Assembler Assembler;
-    std::string test_input = "lw $t0 , 1200, $t1 # comments";
+    std::string test_input = "lw $t0, $t1 , 1200 # comments";
     uint32_t expected_output_bin = 0b10001101001010000000010010110000;
     uint32_t rtn_bin = Assembler.object_code(test_input);
     REQUIRE(expected_output_bin == rtn_bin);

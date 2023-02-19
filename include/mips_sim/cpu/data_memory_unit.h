@@ -3,7 +3,7 @@
 
 #include "mips_sim/cpu/memory_unit.h"
 
-class DataMemoryUnit : private MemoryUnit
+class DataMemoryUnit : public MemoryUnit
 {
 public:
     DataMemoryUnit() = default;

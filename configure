@@ -1,0 +1,15 @@
+#!/bin/bash
+
+s1="-ut";
+s2="-ut";
+
+VAR1="-ut"
+VAR2="Linuxize"
+
+if [ "$1" = "$s1" ]; then
+    echo "Build unit test"
+    cmake -S ../ -DUNIT_TEST=True -DMIPS_EXE=False
+else
+    echo "Build mips_sim"
+    cmake -S ../ -DUNIT_TEST=False -DMIPS_EXE=True
+fi

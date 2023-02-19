@@ -14,7 +14,9 @@ public:
         SLT = 0b0111,
         NOR = 0b1100
     };
-    void process(uint32_t in_val1, uint32_t in_val2, Ctrl ALU_Ctrl, uint32_t out_val, bool &is_zero);
+    void execute(uint32_t in_val1, uint32_t in_val2,
+                 Ctrl ALU_Ctrl,
+                 uint32_t &out_val, bool &is_zero);
 };
 
 #endif // __ALU_H__

@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include <list>
 #include "mips_sim/assembler/parser.h"
 
 //----------------------------------------------------------------------------
@@ -21,10 +21,13 @@ std::vector<std::string> Parser::parse(const std::string str)
 
 std::vector<std::string> Parser::split(const std::string str)
 {
-    std::vector<std::string> list(
-        std::sregex_token_iterator(str.begin(), str.end(), delimiter, -1),
-        std::sregex_token_iterator());
-    return list;
+    std::vector<std::string> tokens;
+    std::sregex_token_iterator rit(str.begin(), str.end(), delimiter, -1);
+    std::remove_copy_if(rit, std::sregex_token_iterator(),
+                        std::back_inserter(tokens),
+                        [](std::string const &s)
+                        { return s.empty(); });
+    return tokens;
 }
 
 //----------------------------------------------------------------------------

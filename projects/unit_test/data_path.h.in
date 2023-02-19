@@ -1,4 +1,3 @@
 #cmakedefine IN_DATA_PATH ${IN_DATA_PATH}
 #cmakedefine OUT_DATA_PATH ${OUT_DATA_PATH}
 #cmakedefine LOGGER_PATH ${LOGGER_PATH}
-

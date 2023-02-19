@@ -12,6 +12,7 @@ class CPU
 {
 public:
     virtual void process() = 0;
+    virtual void reset() = 0;
 
     // blocks
     DataMemoryUnit data_mem;
@@ -20,8 +21,14 @@ public:
     ALU alu;
 
     // internal variables
-    uint32_t pc; // program counter
-    uint32_t cpu_out = 0;
+    uint32_t pc = 0; // program counter
+
+    // helper functions
+    bool is_end_of_program()
+    {
+        uint32_t next_inst = inst_mem.read(pc);
+        return next_inst == MEMORY_DEFAULT_VALUE;
+    }
 };
 
 #endif // __CPU_H__
