@@ -39,14 +39,14 @@ RegisterFile::RegisterFile()
 }
 
 //----------------------------------------------------------------------------
-void RegisterFile::process_read(uint8_t in_r1_idx, uint8_t in_r2_idx,
-                                uint32_t &out_val1, uint32_t &out_val2)
+void RegisterFile::read(uint8_t in_r1_idx, uint8_t in_r2_idx,
+                        uint32_t &out_val1, uint32_t &out_val2)
 {
     out_val1 = read(in_r1_idx);
     out_val2 = read(in_r2_idx);
 }
 //----------------------------------------------------------------------------
-void RegisterFile::process_write(uint8_t in_w_idx, uint32_t in_val, bool ctrl_reg_write)
+void RegisterFile::write(uint8_t in_w_idx, uint32_t in_val, bool ctrl_reg_write)
 {
     if (ctrl_reg_write)
         write(in_w_idx, in_val);

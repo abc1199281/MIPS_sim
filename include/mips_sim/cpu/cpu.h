@@ -22,7 +22,6 @@ public:
 
     // internal variables
     uint32_t pc = 0; // program counter
-    uint32_t cpu_out = 0;
 
     // helper functions
     bool is_end_of_program()
