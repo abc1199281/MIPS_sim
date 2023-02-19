@@ -1,0 +1,1 @@
+#cmakedefine IN_DATA_PATH ${IN_DATA_PATH}

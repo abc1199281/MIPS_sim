@@ -7,38 +7,36 @@
 //----------------------------------------------------------------------------
 void CPU_SingleCycle::process()
 {
-    // fetch instruction
+    // Fetch instruction
     InstructionMemoryUnit::Instruction inst = inst_mem.fetch(pc);
 
-    // Ctrl Unit
+    // Ctrl Units
     CtrlSignals ctrl_signals = ctrl(inst.opcode);
-
     // sign extension
     uint32_t extend_addr = sign_extension(inst.address);
-
     // ALU Ctrl
     ALU::Ctrl ALU_Ctrl = alu_ctrl(inst.funct, ctrl_signals.ALU_Op);
 
-    // register file (read)
+    // Decode and register file (read)
     uint8_t reg_idx_r1 = inst.rs;
     uint8_t reg_idx_r2 = inst.rt;
     uint32_t reg_out1, reg_out2;
-    reg_file.process_read(reg_idx_r1, reg_idx_r2,
-                          reg_out1, reg_out2);
+    reg_file.read(reg_idx_r1, reg_idx_r2,
+                  reg_out1, reg_out2);
 
     L_(ldebug4) << "reg_idx_r1: " << int(reg_idx_r1) << ", reg_idx_r2: " << int(reg_idx_r2);
     L_(ldebug4) << "reg_out1: " << int(reg_out1) << ", reg_out2: " << int(reg_out2) << std::endl;
 
-    // ALU
+    // Execution
     uint32_t alu_in1 = reg_out1;
     uint32_t alu_in2 = multiplier_2to1(ctrl_signals.ALUSrc, extend_addr, reg_out2);
     bool is_zero;
     uint32_t alu_out;
-    alu.process(alu_in1, alu_in2, ALU_Ctrl, alu_out, is_zero);
+    alu.execute(alu_in1, alu_in2, ALU_Ctrl, alu_out, is_zero);
     L_(ldebug4) << "alu_in1: " << int(alu_in1) << ", alu_in2: " << int(alu_in2);
     L_(ldebug4) << "alu_out: " << int(alu_out) << ", is_zero:" << is_zero << std::endl;
 
-    // data memory
+    // Data memory
     uint32_t in_address = alu_out;
     uint32_t in_value = reg_out2;
     uint32_t data_mem_out;
@@ -63,12 +61,12 @@ void CPU_SingleCycle::process()
     L_(ldebug4) << "PC= " << pc;
 
     // final multiplier
-    cpu_out = multiplier_2to1(ctrl_signals.MemtoReg, data_mem_out, alu_out);
+    uint32_t cpu_out = multiplier_2to1(ctrl_signals.MemtoReg, data_mem_out, alu_out);
 
-    // register file (write)
+    // register file (write back)
     uint8_t reg_idx_w1 = multiplier_2to1(ctrl_signals.RegDst, inst.rd, inst.rt);
     uint8_t reg_in_val = cpu_out;
-    reg_file.process_write(reg_idx_w1, reg_in_val, ctrl_signals.RegWrite);
+    reg_file.write(reg_idx_w1, reg_in_val, ctrl_signals.RegWrite);
     L_(ldebug4) << "reg_idx_w1: " << int(reg_idx_w1) << ", reg_in_val: " << int(reg_in_val);
     L_(ldebug4) << "ctrl_signals.RegWrite: " << int(ctrl_signals.RegWrite) << std::endl
                 << std::endl;
