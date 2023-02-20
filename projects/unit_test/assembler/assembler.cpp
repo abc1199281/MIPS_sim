@@ -31,7 +31,7 @@ TEST_CASE("load data", "[assembler]")
 {
     Assembler Assembler;
     std::string test_input_file = std::string(IN_DATA_PATH)+"/assembler/in.asm";
-    std::string test_output_file = std::string(OUT_DATA_PATH)+"/assembler/out.o";
+    std::string test_output_file = std::string(IN_DATA_PATH) + "/assembler/out.o";
     uint32_t expected_output_bin = 0b00000010010010000100000000100000;
     Assembler.load(test_input_file);
     Assembler.save(test_output_file);
