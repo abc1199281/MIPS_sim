@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "mips_sim/cpu/cpu_pipeline.h"
 #include "mips_sim/cpu/cpu_single_cycle.h"
 #include "mips_sim/assembler/assembler.h"
 
@@ -16,7 +17,8 @@ public:
 
 private:
     Assembler assembler;
-    CPU_SingleCycle cpu;
+    // CPU_SingleCycle cpu;
+    CPU_Pipeline cpu;
 };
 
 #endif // __SIMULATOR_H__
