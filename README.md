@@ -3,16 +3,16 @@
 ## Motivation
 
 
-While learning [Computer Organizatino [1]](https://www.google.com/books/edition/_/2-izngEACAAJ?sa=X&ved=2ahUKEwiep9asqaL9AhXEiFwKHcKiDeoQre8FegQILRAa), it seemed like I know every block's behaviour but I was still confused sometimes about how they all connected with each other and actually works perfectly.
+While learning [Computer Organization [1]](https://www.google.com/books/edition/_/2-izngEACAAJ?sa=X&ved=2ahUKEwiep9asqaL9AhXEiFwKHcKiDeoQre8FegQILRAa), it seemed like I know every block's behaviour but I was still confused sometimes about how they all connected with each other and actually works perfectly.
 
-At this moment, practice is essential to solidify and verify the understanding of theory. I developed a simple CPU simulator and corresponding assembler in this repository to verify my implementation. After this, I can finally confirm my understanding of CPU.
+At this moment, practice is essential to solidify and verify the understanding of theory. I developed a simple CPU simulator and corresponding assembler in this repository to verify my understanding. With this testing platform, I can finally confirm my understanding regarding Computer Organization.
 
 ## Features
 - C++11 implementation based on the bible [[1]](https://www.google.com/books/edition/_/2-izngEACAAJ?sa=X&ved=2ahUKEwiep9asqaL9AhXEiFwKHcKiDeoQre8FegQILRAa).
     - Simplified function for easier understanding.
-- Self-explanatory code (I hope).
+- Simplified code written in educational purposes.
     - Single responsibility principle. Each block has its class, and each function has only one responsibility.
-    - Unit test framework to show the usage of each essential block, because I'm a fan of TDD procedure.
+    - Unit test framework to show the usage of each essential block, because I'm a fan of test driven development (TDD).
 - Classic sample
     - A loop counting the lump sum of adding from 1 to 10 is provided. This example utilizes all the instructions taught in Chapter 4.4.
 - Debug Interface
@@ -27,9 +27,12 @@ At this moment, practice is essential to solidify and verify the understanding o
 ## Functions
 - Assembler/Parser (Ch. 2)
 - Single cycle CPU design (Ch. 4.4)
-- Pipeline CPU (Ch. 4.5-4.6)
+- Pipeline CPU (Ch. 4.5-4.6) (*Limited*)
+    - **Note: hazards are not entirely solved yet.**
+
 ### Comming soon
 - Hazards and Exceptions (Ch. 4.7-4.9)
+
 
 ## Usage
 - Biuld:
@@ -84,7 +87,11 @@ INFO, simulator.cpp, show_status: end of show()
         user$../configure
         user$make -j8 # 8 threads
         ~~~
-
+- Run single cycle cpu:
+    - pass this string to Simulator will do so.
+    ~~~c++
+    Simulator sim("SingleCycle");
+    ~~~
 ## Unit test
 - Introduction:
     - It's highly recommended to learn via unit test.
