@@ -25,7 +25,7 @@ void Simulator::simulate(std::string asm_file, std::string mem_file)
     int address = 0;
     while (!obj_code.empty())
     {
-        cpu.inst_mem.write(address, obj_code.front());
+        cpu->inst_mem.write(address, obj_code.front());
         obj_code.pop_front();
         address += 4;
     }
@@ -56,23 +56,23 @@ void Simulator::simulate(std::string asm_file, std::string mem_file)
                 pair.push_back(value);
             }
             L_(ldebug4) << "addr:" << pair[0] << ",value:" << pair[1];
-            cpu.data_mem.write(pair[0], pair[1]);
+            cpu->data_mem.write(pair[0], pair[1]);
         }
     }
 
     // Execute cpu
-    while (!cpu.is_end_of_program())
+    while (!cpu->is_end_of_program())
     {
-        cpu.process();
+        cpu->process();
     }
 }
 //----------------------------------------------------------------------------
 void Simulator::show_status()
 {
     L_(linfo) << "start of reg.show():";
-    cpu.reg_file.show();
+    cpu->reg_file.show();
     L_(linfo) << "start of data_mem.show():";
-    cpu.data_mem.show();
+    cpu->data_mem.show();
     L_(linfo) << "end of show()" << std::endl;
 }
 //----------------------------------------------------------------------------

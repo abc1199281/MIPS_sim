@@ -7,11 +7,17 @@
 //----------------------------------------------------------------------------
 void CPU_Pipeline::process()
 {
+    L_(ldebug4) << "IF";
     instruction_fetch();
+    L_(ldebug4) << "ID";
     instruction_decode();
+    L_(ldebug4) << "EXE";
     execution();
+    L_(ldebug4) << "MEM";
     memory_rw();
+    L_(ldebug4) << "WB";
     write_back();
+    L_(ldebug4) << "processed";
 }
 //----------------------------------------------------------------------------
 void CPU_Pipeline::instruction_fetch()
@@ -25,7 +31,7 @@ void CPU_Pipeline::instruction_fetch()
 //----------------------------------------------------------------------------
 void CPU_Pipeline::instruction_decode()
 {
-    if (!reg_IF_ID.empty())
+    if (reg_IF_ID.empty())
     {
         return;
     }
@@ -59,7 +65,7 @@ void CPU_Pipeline::instruction_decode()
 //----------------------------------------------------------------------------
 void CPU_Pipeline::execution()
 {
-    if (!reg_ID_EX.empty())
+    if (reg_ID_EX.empty())
     {
         return;
     }
@@ -99,7 +105,7 @@ void CPU_Pipeline::execution()
 //----------------------------------------------------------------------------
 void CPU_Pipeline::memory_rw()
 {
-    if (!reg_EX_MEM.empty())
+    if (reg_EX_MEM.empty())
     {
         return;
     }
@@ -128,7 +134,7 @@ void CPU_Pipeline::memory_rw()
 //----------------------------------------------------------------------------
 void CPU_Pipeline::write_back()
 {
-    if (!reg_MEM_WB.empty())
+    if (reg_MEM_WB.empty())
     {
         return;
     }
