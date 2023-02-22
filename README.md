@@ -27,8 +27,9 @@ At this moment, practice is essential to solidify and verify the understanding o
 ## Functions
 - Assembler/Parser (Ch. 2)
 - Single cycle CPU design (Ch. 4.4)
+- Pipeline CPU (Ch. 4.5-4.6)
 ### Comming soon
-- Pipeline CPU (Ch. 4.5-4.8)
+- Hazards and Exceptions (Ch. 4.7-4.9)
 
 ## Usage
 - Biuld:
@@ -64,6 +65,25 @@ INFO, memory_unit.cpp, show: address: 4, value: a
 INFO, memory_unit.cpp, show: address: 8, value: 37
 INFO, simulator.cpp, show_status: end of show()
 ~~~
+- Show Debug messages:
+    1. Modify one line in CMakeLists.txt
+        - Before (default)
+        ~~~cmake
+        #set(FILELOG_MAX_LEVEL "ldebug4") # Display every debug message
+        set(FILELOG_MAX_LEVEL "linfo") # Only Display essential message
+        ~~~
+        - After (Debug mode)
+        ~~~cmake
+        set(FILELOG_MAX_LEVEL "ldebug4") # Display every debug message
+        #set(FILELOG_MAX_LEVEL "linfo") # Only Display essential message
+        ~~~
+    2. Rebuild and execution as before.
+        ~~~shell
+        user$mkdir build
+        user$cd build
+        user$../configure
+        user$make -j8 # 8 threads
+        ~~~
 
 ## Unit test
 - Introduction:
