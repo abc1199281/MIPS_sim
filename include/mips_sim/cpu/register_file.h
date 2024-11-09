@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include <cstdint>
 #include "mips_sim/log.h"
 
 class RegisterFile

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <list>
+#include <cstdint>
 #include <unordered_map>
 #include "mips_sim/assembler/parser.h"
 

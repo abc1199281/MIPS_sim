@@ -1,1 +1,1 @@
-#define IN_DATA_PATH "/home/ubuntu/SelfLearn/MIPS_sim/data/in"
+#define IN_DATA_PATH "/home/powei/my_github/MIPS_sim/data/in"
