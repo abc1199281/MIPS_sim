@@ -9,6 +9,7 @@ At this moment, practice is essential to solidify and verify the understanding o
 
 ## Features
 - C++11 implementation based on the bible [[1]](https://www.google.com/books/edition/_/2-izngEACAAJ?sa=X&ved=2ahUKEwiep9asqaL9AhXEiFwKHcKiDeoQre8FegQILRAa).
+    - Licensed under the [MIT License](LICENSE).
     - Simplified function for easier understanding.
 - Simplified code written in educational purposes.
     - Single responsibility principle. Each block has its class, and each function has only one responsibility.
@@ -133,7 +134,7 @@ All tests passed (15 assertions in 12 test cases)
 
 ## Dependency
 - OS: linux
-- Unit test: catch2
+- Unit test: catch2 (Boost Software License - Version 1.0)
 
 ## Reference
 [1] [Computer Organizatino and Design MIPS Edition 5th, David A. Patterson/John L. Hennessy](https://www.google.com/books/edition/_/2-izngEACAAJ?sa=X&ved=2ahUKEwiep9asqaL9AhXEiFwKHcKiDeoQre8FegQILRAa)
