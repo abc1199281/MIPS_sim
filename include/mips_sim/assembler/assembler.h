@@ -4,6 +4,7 @@
 #include <string>
 #include <list>
 #include <unordered_map>
+#include <cstdint>
 #include "mips_sim/assembler/parser.h"
 
 class Assembler
