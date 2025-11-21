@@ -3,7 +3,17 @@ cmake_minimum_required(VERSION 3.10)
 # set the project name and version
 project(MIPS_MODEL VERSION 1.0)
 
-set(CMAKE_CXX_STANDARD 11)
+if(MIPS_SC_EXE)
+    find_package(SystemCLanguage REQUIRED)
+    find_package(SystemC REQUIRED)
+
+    # Help CMake find SystemC by using the SYSTEMC_HOME environment variable
+    if(DEFINED ENV{SYSTEMC_HOME})
+        list(APPEND CMAKE_PREFIX_PATH $ENV{SYSTEMC_HOME})
+    endif()
+endif()
+
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Setting max display logger level: lerror, lwarning,linfo, ldebug, ldebug1-4
@@ -31,7 +41,9 @@ target_include_directories(mips_sim
 ############################################################
 if(MIPS_EXE)
     message("--- Add mips_sim execute")
-    file(GLOB_RECURSE EXE_SOURCES "./projects/mips_sim/*.cpp")
+    set(EXE_SOURCES
+        ${PROJECT_SOURCE_DIR}/projects/mips_sim/main.cpp
+    )
 
     set(IN_DATA_PATH "\"${PROJECT_SOURCE_DIR}/data/in\"")
 
@@ -54,6 +66,35 @@ if(MIPS_EXE)
         mips_sim
     )
 endif()
+
+############################################################
+# Create a SystemC executable
+############################################################
+if(MIPS_SC_EXE)
+    message("--- Add mips_sim_sc execute")
+    set(EXE_SC_SOURCES
+        ${PROJECT_SOURCE_DIR}/projects/mips_sim/main_sc.cpp
+    )
+
+    # Add an executable with the above sources
+    add_executable(mips_sc_sim
+        ${EXE_SC_SOURCES}
+    )
+
+    target_include_directories(mips_sc_sim
+        PUBLIC
+        ${PROJECT_SOURCE_DIR}/thirdparty
+        ${PROJECT_SOURCE_DIR}/projects/mips_sim
+    )
+
+    # link the new mips_sim target with the mips_ut target
+    target_link_libraries(mips_sc_sim
+        PRIVATE
+        mips_sim
+        SystemC::systemc
+    )
+endif()
+
 ############################################################
 # Create an unit test
 ############################################################
